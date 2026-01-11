@@ -1,0 +1,58 @@
+name: "👥 NPC Request"
+description: Suggest a new character to inhabit the world of Neon Life
+labels: ["enhancement", "character-design"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to propose a new NPC for the social and romance systems.
+  - type: input
+    id: npc-name
+    attributes:
+      label: NPC Name
+      placeholder: "e.g., Vesper, Kael, Zenith"
+    validations:
+      required: true
+  - type: dropdown
+    id: archetype
+    attributes:
+      label: Archetype
+      description: What is their role in the city?
+      options:
+        - Tech-Noir Investigator
+        - Black Market Dealer
+        - Synth-Pop Idol
+        - Corporate Defector
+        - Wasteland Drifter
+        - Other (Specify in description)
+    validations:
+      required: true
+  - type: textarea
+    id: personality
+    attributes:
+      label: Personality Traits
+      description: How do they behave? Are they cold, friendly, mysterious?
+      placeholder: "e.g., Cynical but protective, speaks in riddles..."
+    validations:
+      required: true
+  - type: textarea
+    id: interaction-ideas
+    attributes:
+      label: Interaction Ideas
+      description: Suggest some unique dialogue or activities for this NPC.
+      placeholder: "e.g., Meeting at the underground bar, helping them hack a secure terminal..."
+  - type: input
+    id: romance-tier
+    attributes:
+      label: Romance Path
+      description: Should this NPC be a romance option? (Yes/No)
+      placeholder: "Yes"
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I understand that characters may be modified to fit the game balance.
+          required: true
+        - label: I have checked that a similar NPC doesn't already exist.
+          required: true
