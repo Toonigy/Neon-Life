@@ -1,0 +1,70 @@
+name: "🐛 Bug Report"
+description: Report a bug to help improve Neon Life
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "e.g., The money counter doesn't update after working a job."
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we make this bug happen again?
+      placeholder: |
+        1. Start New Game
+        2. Enter name 'Test'
+        3. Click 'Initialize'
+        4. Click 'Work' on Alley Scrapper
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: "The credits should increase by 50."
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Game Version
+      description: Which version of Neon Life are you running?
+      options:
+        - v1.1.0 Beta
+        - v1.0.0 Alpha
+        - Main Branch (Latest Commit)
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser & OS
+      description: e.g., Chrome on Windows 11, Safari on iOS
+      placeholder: "Chrome 120 / Windows 11"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Action Log / Console Output
+      description: Please paste the relevant lines from the in-game "Action Log" or browser console (F12).
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I have checked that this bug isn't already reported.
+          required: true
+        - label: I am using the latest version of the game.
+          required: true
