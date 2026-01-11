@@ -10,6 +10,7 @@
         :root {
             --neon-pink: #ff00ff;
             --neon-blue: #00f2ff;
+            --neon-green: #39ff14;
             --dark-bg: #050505;
         }
 
@@ -60,7 +61,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Scanline effect */
         .scanlines {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -69,17 +69,29 @@
             pointer-events: none;
             z-index: 50;
         }
+
+        .stat-bar-container {
+            height: 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
     </style>
 </head>
 <body>
     <div class="scanlines"></div>
 
-    <!-- Main Container -->
     <div class="relative h-full w-full flex items-center justify-center p-4">
         
         <!-- TITLE SCREEN -->
         <section id="screen-title" class="screen active-screen flex-col items-center">
-            <h1 class="text-7xl md:text-9xl font-orbitron font-bold neon-text-pink mb-12 italic">NEON LIFE</h1>
+            <h1 class="text-7xl md:text-9xl font-orbitron font-bold neon-text-pink mb-12 italic text-center">NEON LIFE</h1>
             
             <div class="flex flex-col gap-6 w-64">
                 <button onclick="showScreen('screen-creation')" class="btn-neon neon-border-blue py-3 px-6 rounded text-xl font-bold">New Game</button>
@@ -87,7 +99,7 @@
                 <input type="file" id="file-input" class="hidden" accept=".json" onchange="loadSaveFromFile(event)">
             </div>
             
-            <p class="mt-12 text-gray-500 uppercase tracking-widest text-sm">v1.0.0 Alpha - Singleplayer</p>
+            <p class="mt-12 text-gray-500 uppercase tracking-widest text-sm">v1.1.0 Beta - Singleplayer</p>
         </section>
 
         <!-- CHARACTER CREATION SCREEN -->
@@ -117,23 +129,59 @@
             </div>
         </section>
 
-        <!-- HUD / GAMEPLAY SCREEN (Placeholder for Part 2) -->
-        <section id="screen-game" class="screen flex-col w-full h-full p-6">
-            <div class="flex justify-between border-b border-cyan-800 pb-4">
-                <div>
-                    <h3 id="display-name" class="text-3xl font-orbitron text-white">---</h3>
-                    <p id="display-gender" class="text-cyan-400 uppercase text-sm tracking-widest"></p>
+        <!-- GAMEPLAY SCREEN -->
+        <section id="screen-game" class="screen flex-col w-full h-full p-2 md:p-6 overflow-hidden">
+            <!-- HUD TOP -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-b border-cyan-800 pb-4 mb-4">
+                <div class="flex flex-col">
+                    <h3 id="display-name" class="text-2xl font-orbitron text-white leading-none">---</h3>
+                    <p id="display-gender" class="text-cyan-400 uppercase text-xs tracking-widest mt-1"></p>
+                    <p class="text-yellow-400 font-bold mt-2">CREDITS: <span id="display-money">0</span></p>
                 </div>
-                <div class="text-right">
-                    <p class="text-gray-400 italic">Game Status: Running</p>
-                    <button onclick="exportSave()" class="text-xs border border-gray-600 px-2 py-1 mt-2 hover:bg-white hover:text-black transition-all">Export Save to PC</button>
+
+                <div class="space-y-2">
+                    <div>
+                        <div class="flex justify-between text-[10px] uppercase text-gray-400"><span>Vitality</span> <span id="val-health">100%</span></div>
+                        <div class="stat-bar-container"><div id="bar-health" class="stat-bar-fill bg-red-600" style="width: 100%"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] uppercase text-gray-400"><span>Neural Stability</span> <span id="val-happiness">100%</span></div>
+                        <div class="stat-bar-container"><div id="bar-happiness" class="stat-bar-fill bg-purple-600" style="width: 100%"></div></div>
+                    </div>
+                </div>
+
+                <div class="text-right flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs text-gray-500 italic">Day <span id="display-day">1</span> - <span id="display-job">Unemployed</span></p>
+                    </div>
+                    <button onclick="exportSave()" class="text-[10px] border border-gray-600 px-2 py-1 self-end hover:bg-white hover:text-black transition-all">DATA EXPORT</button>
                 </div>
             </div>
             
-            <div class="flex-grow flex items-center justify-center">
-                <div class="text-center">
-                    <p class="text-2xl text-gray-500 animate-pulse">Waiting for Part 2: Life Mechanics...</p>
+            <!-- MAIN INTERACTION AREA -->
+            <div class="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto pr-2">
+                
+                <!-- JOBS BOARD -->
+                <div class="bg-black/40 p-4 border border-gray-800 rounded">
+                    <h4 class="text-cyan-400 font-orbitron mb-4 border-b border-cyan-900 pb-1">LABOR EXCHANGE</h4>
+                    <div id="job-list" class="space-y-3">
+                        <!-- Dynamic Jobs -->
+                    </div>
                 </div>
+
+                <!-- ROMANCE / SOCIAL -->
+                <div class="bg-black/40 p-4 border border-gray-800 rounded">
+                    <h4 class="text-pink-500 font-orbitron mb-4 border-b border-pink-900 pb-1">SOCIAL LINKS</h4>
+                    <div id="social-list" class="space-y-4">
+                        <!-- Dynamic NPCs -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ACTION LOG -->
+            <div id="action-log" class="mt-4 h-24 overflow-y-auto bg-black p-2 border border-gray-900 text-xs font-mono text-green-500">
+                <div>> Initializing Life OS...</div>
             </div>
         </section>
 
@@ -144,14 +192,29 @@
     </div>
 
     <script>
+        // Game Constants
+        const JOBS = [
+            { id: 'scrapper', name: 'Alley Scrapper', pay: 50, healthCost: 10, happinessCost: 5, req: 0 },
+            { id: 'courier', name: 'Neon Courier', pay: 120, healthCost: 5, happinessCost: 10, req: 500 },
+            { id: 'hacker', name: 'Data Miner', pay: 300, healthCost: 2, happinessCost: 20, req: 2000 }
+        ];
+
+        const NPCS = [
+            { id: 'nova', name: 'Nova', archetype: 'Street Doc', affinity: 0, status: 'Stranger' },
+            { id: 'jax', name: 'Jax', archetype: 'Nightclub DJ', affinity: 0, status: 'Stranger' },
+            { id: 'echo', name: 'Echo', archetype: 'Cyborg Artist', affinity: 0, status: 'Stranger' }
+        ];
+
         // Game State
         let gameState = {
             name: "",
             gender: "",
-            age: 18,
+            day: 1,
             money: 1000,
             health: 100,
-            happiness: 100
+            happiness: 100,
+            currentJob: null,
+            socialLinks: [...NPCS]
         };
 
         function showScreen(screenId) {
@@ -167,6 +230,14 @@
             });
         }
 
+        function logAction(text) {
+            const log = document.getElementById('action-log');
+            const entry = document.createElement('div');
+            entry.innerText = `> ${text}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
         function showMessage(text) {
             const box = document.getElementById('message-box');
             box.innerText = text;
@@ -180,17 +251,86 @@
             if (!gameState.gender) return showMessage("Please select a gender.");
 
             gameState.name = nameInput;
-            updateGameUI();
+            refreshUI();
             showScreen('screen-game');
-            showMessage("Simulation Initialized.");
+            logAction(`Citizen ${gameState.name} registered. Biological profile: ${gameState.gender}.`);
         }
 
-        function updateGameUI() {
+        // --- Core Mechanics ---
+
+        function work(jobId) {
+            const job = JOBS.find(j => j.id === jobId);
+            if (gameState.health < job.healthCost) return showMessage("Too exhausted to work!");
+            
+            gameState.money += job.pay;
+            gameState.health -= job.healthCost;
+            gameState.happiness -= job.happinessCost;
+            gameState.day++;
+            
+            logAction(`Worked as ${job.name}. Earned ${job.pay} credits. Day ${gameState.day} starts.`);
+            refreshUI();
+        }
+
+        function interact(npcId) {
+            const npc = gameState.socialLinks.find(n => n.id === npcId);
+            if (gameState.money < 50) return showMessage("Need 50 credits to hang out.");
+            
+            gameState.money -= 50;
+            npc.affinity += 10;
+            
+            if (npc.affinity >= 100) npc.status = "In Love";
+            else if (npc.affinity >= 50) npc.status = "Close Friend";
+            else if (npc.affinity >= 20) npc.status = "Acquaintance";
+
+            logAction(`Spent time with ${npc.name}. Relationship improved to: ${npc.status}.`);
+            refreshUI();
+        }
+
+        function refreshUI() {
+            // Stats
             document.getElementById('display-name').innerText = gameState.name;
             document.getElementById('display-gender').innerText = gameState.gender;
+            document.getElementById('display-money').innerText = gameState.money.toLocaleString();
+            document.getElementById('display-day').innerText = gameState.day;
+            
+            // Health Bars
+            document.getElementById('val-health').innerText = `${Math.max(0, gameState.health)}%`;
+            document.getElementById('bar-health').style.width = `${Math.max(0, gameState.health)}%`;
+            document.getElementById('val-happiness').innerText = `${Math.max(0, gameState.happiness)}%`;
+            document.getElementById('bar-happiness').style.width = `${Math.max(0, gameState.happiness)}%`;
+
+            // Render Jobs
+            const jobList = document.getElementById('job-list');
+            jobList.innerHTML = JOBS.map(job => `
+                <div class="flex justify-between items-center p-2 border border-gray-700 rounded hover:bg-cyan-900/20 transition-all">
+                    <div>
+                        <div class="font-bold text-sm">${job.name}</div>
+                        <div class="text-[10px] text-gray-500 uppercase">Pay: ${job.pay} | Health: -${job.healthCost}</div>
+                    </div>
+                    <button onclick="work('${job.id}')" 
+                        class="px-3 py-1 text-xs border border-cyan-600 rounded hover:bg-cyan-600 hover:text-black">
+                        WORK
+                    </button>
+                </div>
+            `).join('');
+
+            // Render Social
+            const socialList = document.getElementById('social-list');
+            socialList.innerHTML = gameState.socialLinks.map(npc => `
+                <div class="flex justify-between items-center bg-gray-900/30 p-3 rounded">
+                    <div>
+                        <div class="font-bold text-pink-400">${npc.name} <span class="text-[10px] text-gray-500">[${npc.archetype}]</span></div>
+                        <div class="text-[10px] uppercase text-gray-400">Bond: ${npc.affinity}% | Status: ${npc.status}</div>
+                    </div>
+                    <button onclick="interact('${npc.id}')" 
+                        class="px-3 py-1 text-xs border border-pink-600 text-pink-500 rounded hover:bg-pink-600 hover:text-white">
+                        INTERACT (50₵)
+                    </button>
+                </div>
+            `).join('');
         }
 
-        // Save and Load Logic
+        // --- Save/Load Logic ---
         function triggerFileLoad() {
             document.getElementById('file-input').click();
         }
@@ -205,7 +345,7 @@
                     const loadedState = JSON.parse(e.target.result);
                     if (loadedState.name && loadedState.gender) {
                         gameState = loadedState;
-                        updateGameUI();
+                        refreshUI();
                         showScreen('screen-game');
                         showMessage("Save file loaded successfully.");
                     } else {
@@ -221,14 +361,11 @@
         function exportSave() {
             const dataStr = JSON.stringify(gameState, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
             const exportFileDefaultName = `neon_life_save_${gameState.name.toLowerCase()}.json`;
-            
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
-            
             showMessage("Save exported to your PC.");
         }
     </script>
