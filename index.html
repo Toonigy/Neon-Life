@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Life - Life Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00f2ff;
+            --dark-bg: #050505;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+        .neon-text-pink {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--neon-pink), 0 0 30px var(--neon-pink), 0 0 40px var(--neon-pink);
+        }
+
+        .neon-border-blue {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue), inset 0 0 5px var(--neon-blue);
+        }
+
+        .btn-neon {
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        .btn-neon:hover {
+            background: var(--neon-blue);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .active-screen {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scanline effect */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <!-- Main Container -->
+    <div class="relative h-full w-full flex items-center justify-center p-4">
+        
+        <!-- TITLE SCREEN -->
+        <section id="screen-title" class="screen active-screen flex-col items-center">
+            <h1 class="text-7xl md:text-9xl font-orbitron font-bold neon-text-pink mb-12 italic">NEON LIFE</h1>
+            
+            <div class="flex flex-col gap-6 w-64">
+                <button onclick="showScreen('screen-creation')" class="btn-neon neon-border-blue py-3 px-6 rounded text-xl font-bold">New Game</button>
+                <button onclick="triggerFileLoad()" class="btn-neon neon-border-blue py-3 px-6 rounded text-xl font-bold">Load Save</button>
+                <input type="file" id="file-input" class="hidden" accept=".json" onchange="loadSaveFromFile(event)">
+            </div>
+            
+            <p class="mt-12 text-gray-500 uppercase tracking-widest text-sm">v1.0.0 Alpha - Singleplayer</p>
+        </section>
+
+        <!-- CHARACTER CREATION SCREEN -->
+        <section id="screen-creation" class="screen flex-col items-center bg-black/80 p-8 rounded-lg neon-border-blue max-w-md w-full">
+            <h2 class="text-4xl font-orbitron mb-8 text-cyan-400">IDENTITY REGISTRY</h2>
+            
+            <div class="w-full space-y-6">
+                <div>
+                    <label class="block text-sm uppercase tracking-tighter text-gray-400 mb-2">Citizen Name</label>
+                    <input type="text" id="input-name" placeholder="ENTER NAME..." 
+                        class="w-full bg-transparent border-b-2 border-cyan-900 focus:border-cyan-400 outline-none p-2 text-2xl font-bold text-white uppercase">
+                </div>
+
+                <div>
+                    <label class="block text-sm uppercase tracking-tighter text-gray-400 mb-2">Biological Profile</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setGender('Male')" class="gender-btn border border-gray-700 p-2 hover:border-cyan-400 transition-colors">MALE</button>
+                        <button onclick="setGender('Female')" class="gender-btn border border-gray-700 p-2 hover:border-cyan-400 transition-colors">FEMALE</button>
+                        <button onclick="setGender('Non-Binary')" class="gender-btn border border-gray-700 p-2 hover:border-cyan-400 transition-colors">NON-BI</button>
+                    </div>
+                </div>
+
+                <div class="pt-6 flex justify-between">
+                    <button onclick="showScreen('screen-title')" class="text-gray-500 hover:text-white uppercase">Back</button>
+                    <button onclick="startGame()" class="btn-neon neon-border-blue px-8 py-2 font-bold">Initialize</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- HUD / GAMEPLAY SCREEN (Placeholder for Part 2) -->
+        <section id="screen-game" class="screen flex-col w-full h-full p-6">
+            <div class="flex justify-between border-b border-cyan-800 pb-4">
+                <div>
+                    <h3 id="display-name" class="text-3xl font-orbitron text-white">---</h3>
+                    <p id="display-gender" class="text-cyan-400 uppercase text-sm tracking-widest"></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 italic">Game Status: Running</p>
+                    <button onclick="exportSave()" class="text-xs border border-gray-600 px-2 py-1 mt-2 hover:bg-white hover:text-black transition-all">Export Save to PC</button>
+                </div>
+            </div>
+            
+            <div class="flex-grow flex items-center justify-center">
+                <div class="text-center">
+                    <p class="text-2xl text-gray-500 animate-pulse">Waiting for Part 2: Life Mechanics...</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Feedback Message Box -->
+    <div id="message-box" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-cyan-900 border border-cyan-400 text-white px-6 py-2 rounded hidden z-50">
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            name: "",
+            gender: "",
+            age: 18,
+            money: 1000,
+            health: 100,
+            happiness: 100
+        };
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(screenId).classList.add('active-screen');
+        }
+
+        function setGender(g) {
+            gameState.gender = g;
+            document.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.style.borderColor = btn.innerText.includes(g.toUpperCase().substring(0,3)) ? '#00f2ff' : '#374151';
+                btn.style.color = btn.innerText.includes(g.toUpperCase().substring(0,3)) ? '#00f2ff' : 'white';
+            });
+        }
+
+        function showMessage(text) {
+            const box = document.getElementById('message-box');
+            box.innerText = text;
+            box.classList.remove('hidden');
+            setTimeout(() => box.classList.add('hidden'), 3000);
+        }
+
+        function startGame() {
+            const nameInput = document.getElementById('input-name').value.trim();
+            if (!nameInput) return showMessage("Please enter a name.");
+            if (!gameState.gender) return showMessage("Please select a gender.");
+
+            gameState.name = nameInput;
+            updateGameUI();
+            showScreen('screen-game');
+            showMessage("Simulation Initialized.");
+        }
+
+        function updateGameUI() {
+            document.getElementById('display-name').innerText = gameState.name;
+            document.getElementById('display-gender').innerText = gameState.gender;
+        }
+
+        // Save and Load Logic
+        function triggerFileLoad() {
+            document.getElementById('file-input').click();
+        }
+
+        function loadSaveFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const loadedState = JSON.parse(e.target.result);
+                    if (loadedState.name && loadedState.gender) {
+                        gameState = loadedState;
+                        updateGameUI();
+                        showScreen('screen-game');
+                        showMessage("Save file loaded successfully.");
+                    } else {
+                        throw new Error("Invalid save format");
+                    }
+                } catch (err) {
+                    showMessage("Error: Corrupted save file.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportSave() {
+            const dataStr = JSON.stringify(gameState, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `neon_life_save_${gameState.name.toLowerCase()}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showMessage("Save exported to your PC.");
+        }
+    </script>
+</body>
+</html>
